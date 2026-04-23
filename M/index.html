@@ -34,42 +34,20 @@
       overflow: hidden;
     }
 
-    .balloon {
+    .balloon-svg {
       position: absolute;
-      bottom: -160px;
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      animation: floatUp linear infinite;
-      opacity: 0.88;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
-    }
-    .balloon::after {
-      content: '';
-      position: absolute;
-      bottom: -18px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 22px;
-      background: rgba(0,0,0,0.25);
-    }
-    .balloon::before {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 10px;
-      height: 10px;
-      background: inherit;
-      border-radius: 50%;
+      bottom: -180px;
+      animation: floatUp linear forwards;
+      filter: drop-shadow(2px 6px 10px rgba(0,0,0,0.18));
     }
 
     @keyframes floatUp {
-      0%   { transform: translateY(0) rotate(-4deg); opacity: 0; }
-      5%   { opacity: 0.88; }
-      50%  { transform: translateY(-52vh) rotate(4deg); }
-      95%  { opacity: 0.88; }
-      100% { transform: translateY(-110vh) rotate(-4deg); opacity: 0; }
+      0%   { transform: translateY(0)      rotate(-3deg); opacity: 0; }
+      5%   { opacity: 0.92; }
+      48%  { transform: translateY(-50vh)  rotate(3deg);  opacity: 0.92; }
+      52%  { transform: translateY(-54vh)  rotate(-2deg); opacity: 0.92; }
+      95%  { opacity: 0.85; }
+      100% { transform: translateY(-112vh) rotate(3deg);  opacity: 0; }
     }
 
     /* ─── NAV ─── */
@@ -204,46 +182,52 @@
 
     .countdown-grid {
       display: flex;
-      gap: 1rem;
+      gap: clamp(0.2rem, 1.5vw, 1rem);
       justify-content: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;   /* ← siempre en una sola línea */
+      align-items: flex-start;
+      width: 100%;
     }
 
     .countdown-box {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.3rem;
+      flex: 1;             /* ← cada bloque ocupa espacio equitativo */
+      min-width: 0;        /* ← permite comprimir si es necesario */
     }
 
     .countdown-num {
       font-family: 'Pacifico', cursive;
-      font-size: clamp(2.8rem, 8vw, 4.5rem);
+      font-size: clamp(1.6rem, 5.5vw, 4.5rem);   /* ← se achica en móvil */
       background: linear-gradient(135deg, var(--pink-hot), var(--purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      min-width: 110px;
-      display: inline-block;
+      display: block;
       text-align: center;
       line-height: 1;
       filter: drop-shadow(0 2px 6px rgba(255,61,139,0.3));
+      white-space: nowrap;
     }
 
     .countdown-label {
-      font-size: 0.8rem;
+      font-size: clamp(0.55rem, 1.8vw, 0.8rem);  /* ← también escala */
       font-weight: 700;
       color: var(--pink-mid);
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
+      white-space: nowrap;
     }
 
     .countdown-sep {
       font-family: 'Pacifico', cursive;
-      font-size: 3rem;
+      font-size: clamp(1.4rem, 4vw, 3rem);        /* ← separador escalable */
       color: var(--pink-soft);
-      margin-top: -10px;
+      margin-top: 2px;
       line-height: 1;
+      flex-shrink: 0;
     }
 
     .countdown-date {
@@ -335,22 +319,7 @@
     @media (max-width: 600px) {
       .nav-links { gap: 0.3rem; }
       .nav-links a { font-size: 0.78rem; padding: 0.35rem 0.7rem; }
-      .countdown-card { padding: 1.8rem 1rem; }
-      .countdown-grid {
-        flex-wrap: nowrap;
-        gap: 0.4rem;
-      }
-      .countdown-num {
-        min-width: 38px;
-        font-size: 1.5rem;
-      }
-      .countdown-sep {
-        font-size: 1.2rem;
-        margin-top: 0;
-      }
-      .countdown-label {
-        font-size: 0.65rem;
-      }
+      .countdown-card { padding: 1.5rem 0.8rem; }
     }
   </style>
 </head>
@@ -361,10 +330,9 @@
 
   <!-- NAV -->
   <nav>
-    <span class="nav-logo">🎀 Cumple Mire</span>
+    <span class="nav-logo">🎀 Mire</span>
     <ul class="nav-links">
       <li><a href="#inicio"   class="active">🏠 Mire</a></li>
-
     </ul>
   </nav>
 
@@ -374,7 +342,7 @@
       <div class="hero">
         <span class="hero-emoji">🎂</span>
         <h1>¡Cumpleaños de Mire!</h1>
-        <p style="">🎉 Una fecha muy especial se acerca 🎉</p>
+        <p>🎉 Una fecha muy especial se acerca 🎉</p>
       </div>
     </section>
 
@@ -449,43 +417,83 @@
     setInterval(updateCountdown, 1000);
 
     /* ═══════════════════════════════
-       2. GLOBOS DINÁMICOS
+       2. GLOBOS DINÁMICOS — forma SVG real
     ═══════════════════════════════ */
     const colors = [
-      '#ff3d8b','#ff85b3','#ffc2db','#ff69b4',
-      '#c44dff','#ff1493','#ffb6d9','#e040fb',
-      '#f8a4cc','#ff6eb4'
+      ['#ff3d8b','#ff85b3'],
+      ['#ff69b4','#ffb6d9'],
+      ['#c44dff','#e89fff'],
+      ['#ff1493','#ff85b3'],
+      ['#e040fb','#f0a0ff'],
+      ['#ff6eb4','#ffc2db'],
+      ['#f8a4cc','#ffd6ea'],
+      ['#ff3d8b','#c44dff'],
     ];
 
     function createBalloon(){
-      const el   = document.createElement('div');
-      el.className = 'balloon';
-      const size = 45 + Math.random() * 55;
-      const left = Math.random() * 98;
-      const dur  = 7 + Math.random() * 10;
-      const delay= Math.random() * 6;
-      const color= colors[Math.floor(Math.random() * colors.length)];
+      const size  = 55 + Math.random() * 60;          // ancho del globo
+      const h     = size * 1.28;                       // alto proporcional
+      const left  = Math.random() * 96;
+      const dur   = 8 + Math.random() * 11;
+      const delay = Math.random() * 5;
+      const [c1, c2] = colors[Math.floor(Math.random() * colors.length)];
+      const id    = 'bg' + Math.random().toString(36).slice(2);
 
-      el.style.cssText = `
-        width:${size}px; height:${size * 1.18}px;
-        left:${left}%;
-        background:radial-gradient(circle at 35% 30%, rgba(255,255,255,0.55), ${color});
-        animation-duration:${dur}s;
-        animation-delay:${delay}s;
+      // SVG con path que imita la silueta real:
+      // cuerpo ovoide más ancho en su tercio superior, estrecho abajo, nudo y hilo
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg   = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('width',  size);
+      svg.setAttribute('height', h + 40);             // +40 para hilo
+      svg.setAttribute('viewBox', `0 0 100 ${130 + 40}`);
+      svg.classList.add('balloon-svg');
+      svg.style.cssText = `left:${left}%; animation-duration:${dur}s; animation-delay:${delay}s;`;
+
+      svg.innerHTML = `
+        <defs>
+          <radialGradient id="${id}" cx="38%" cy="30%" r="62%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,0.72)"/>
+            <stop offset="45%"  stop-color="${c2}"/>
+            <stop offset="100%" stop-color="${c1}"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Cuerpo del globo: ovoide asimétrico, más ancho arriba -->
+        <path d="
+          M 50 8
+          C 85 8, 96 30, 94 58
+          C 92 86, 78 108, 60 118
+          C 55 121, 52 122, 50 122
+          C 48 122, 45 121, 40 118
+          C 22 108, 8 86, 6 58
+          C 4 30, 15 8, 50 8 Z
+        " fill="url(#${id})"/>
+
+        <!-- Brillo superior izquierdo -->
+        <ellipse cx="34" cy="28" rx="10" ry="6"
+          fill="rgba(255,255,255,0.38)" transform="rotate(-30,34,28)"/>
+
+        <!-- Nudo inferior -->
+        <path d="M 46 122 Q 50 130 54 122" fill="none" stroke="${c1}" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="50" cy="131" rx="4" ry="3.5" fill="${c1}"/>
+
+        <!-- Hilo ondulado -->
+        <path d="M 50 134 Q 44 145 50 155 Q 56 165 50 170" fill="none"
+          stroke="rgba(0,0,0,0.28)" stroke-width="1.5" stroke-linecap="round"/>
       `;
-      document.getElementById('balloon-canvas').appendChild(el);
 
-      setTimeout(() => el.remove(), (dur + delay) * 1000);
+      document.getElementById('balloon-canvas').appendChild(svg);
+      setTimeout(() => svg.remove(), (dur + delay + 1) * 1000);
     }
 
     // Lanzar globos continuamente
-    for(let i = 0; i < 14; i++) setTimeout(createBalloon, i * 500);
-    setInterval(createBalloon, 1000);
+    for(let i = 0; i < 14; i++) setTimeout(createBalloon, i * 400);
+    setInterval(createBalloon, 900);
 
     /* ═══════════════════════════════
        3. DESTELLOS / SPARKLES
     ═══════════════════════════════ */
-    const sparkleEmojis = ['✨','🌸','💖','🎀','⭐','💫','🌟','💝'];
+    const sparkleEmojis = ['✨','🌸','💖','🎀','⭐','🌟','💝', '🦒'];
 
     function createSparkle(){
       const el   = document.createElement('span');
